@@ -1,0 +1,10 @@
+{
+  "name": "cert-cli",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "ethers": "^6.15.0",
+    "prompt-sync": "^4.2.0"
+  }
+}

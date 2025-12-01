@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+    ganache:
+        image: trufflesuite/ganache:latest
+        command:
+            - "--host"
+            - "0.0.0.0"
+            - "--chain.chainId"
+            - "1337"
+            - "--wallet.totalAccounts"
+            - "10"
+            - "--miner.blockTime"
+            - "1"
+        ports:
+            - "8545:8545"
+        networks:
+            - certnet
+
+    hardhat:
+        image: node:22.10
+        working_dir: /workspace
+        volumes:
+            - ./dapp:/workspace
+        depends_on:
+            - ganache
+        networks:
+            - certnet
+        command: >
+            sh -c " rm -rf node_modules package-lock.json && npm install --save-dev hardhat@^2.27.0 @nomicfoundation/hardhat-toolbox@^6.1.0 && npx hardhat node --hostname 0.0.0.0 "
+        ports:
+            - "8546:8545"
+
+    client:
+        image: node:22.10
+        working_dir: /app
+        volumes:
+            - ./client:/app
+        environment:
+            RPC_URL: http://ganache:8545
+        depends_on:
+            - hardhat
+            - ganache
+        networks:
+            - certnet
+        command: >
+            sh -c " npm install && node index.js "
+
+networks:
+    certnet:
+        name: certnet
